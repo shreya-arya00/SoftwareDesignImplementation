@@ -32,8 +32,9 @@ class Product {
 class ShoppingCart {
     private List<Product> items;
 
-    public ShoppingCart() {
-        this.items = new ArrayList<>();
+    // Dependency Injection for items
+    public ShoppingCart(List<Product> items) {
+        this.items = items;
     }
 
     // Add product to shopping cart
@@ -41,22 +42,35 @@ class ShoppingCart {
         items.add(product);
     }
 
-    // Remove product from shopping cart
-    public void removeProduct(Product product) {
-        items.remove(product);
+    // Remove product from shopping cart and return it
+    public Product removeProduct(Product product) {
+        if (!items.isEmpty()) {
+            items.remove(product);
+            return product;
+        } else {
+            throw new EmptyCartException("The shopping cart is empty. Cannot remove a product.");
+        }
     }
 
     // View contents of shopping cart
-    public Object viewCart() {
+    public void viewCart() {
         System.out.println("Items in your shopping cart:");
         for (Product item : items) {
             System.out.println(item.getName() + " - $" + item.getPrice());
         }
-        return null;
     }
 
-    public Collection<Object> getItems() {
-    return null;}
+    // Get items in the shopping cart
+    public Collection<Product> getItems() {
+        return items;
+    }
+}
+
+// Custom Exception for an empty shopping cart
+class EmptyCartException extends RuntimeException {
+    public EmptyCartException(String message) {
+        super(message);
+    }
 }
 
 // Main class to run the program
@@ -67,18 +81,18 @@ public class OnlineShoppingSystem {
         Product product1 = new Product("Product 1", "Description for Product 1", 19.99);
         Product product2 = new Product("Product 2", "Description for Product 2", 29.99);
 
-        // Initialize shopping cart
-        ShoppingCart cart = new ShoppingCart();
-
-        // Add products to shopping cart
-        cart.addProduct(product1);
-        cart.addProduct(product2);
+        // Initialize shopping cart with ArrayList
+        List<Product> productList = new ArrayList<>();
+        productList.add(product1);
+        productList.add(product2);
+        ShoppingCart cart = new ShoppingCart(productList);
 
         // View contents of shopping cart
         cart.viewCart();
 
         // Remove a product from shopping cart
-        cart.removeProduct(product1);
+        Product removedProduct = cart.removeProduct(product1);
+        System.out.println("Removed Product: " + removedProduct.getName());
 
         // View updated contents of shopping cart
         cart.viewCart();
